@@ -13,8 +13,8 @@ COPY package.json ./
 RUN npm install
 
 # Copy the rest of the frontend source code
-COPY src/ ./src/
-COPY public/ ./public/
+COPY Src/ ./src/
+COPY Public/ ./public/
 
 # Build the static files for production
 RUN npm run build
