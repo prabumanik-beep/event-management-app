@@ -14,7 +14,7 @@ RUN npm install
 
 # Copy the rest of the frontend source code
 COPY Src/ ./src/
-COPY Public/ ./public/
+COPY public/ ./public/
 
 # Build the static files for production
 RUN npm run build
