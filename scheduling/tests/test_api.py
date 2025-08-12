@@ -143,8 +143,8 @@ def test_update_profile_interests_success(api_client, test_user, skills):
     assert test_user.profile.interests.count() == 0
 
     # We want to add the first two skills as interests
-    skill_ids_to_add = [skills[0].id, skills[1].id]
-    payload = {'interest_ids': skill_ids_to_add}
+    skill_names_to_add = [skills[0].name, skills[1].name]
+    payload = {'interest_names': skill_names_to_add}
     
     response = api_client.put(url, data=payload)
     

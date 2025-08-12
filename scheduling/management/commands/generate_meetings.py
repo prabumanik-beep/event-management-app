@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 from scheduling.intelligent_scheduler import solve_meeting_schedule
-from scheduling.models import Meeting
+from scheduling.models import Meeting, Notification
 
 class Command(BaseCommand):
     help = 'Runs the intelligent scheduler to generate and save the optimal meeting schedule.'
@@ -41,21 +41,33 @@ class Command(BaseCommand):
                 self.stdout.write("Clearing previously scheduled future meetings...")
                 meetings_to_delete = Meeting.objects.filter(time_slot__start_time__gte=timezone.now())
                 meetings_to_delete.delete()
+
                 self.stdout.write(f"Creating {len(proposed_meetings)} new meetings...")
-
                 meetings_to_create = [
-                    Meeting(
-                        attendee1=m['attendee1'],
-                        attendee2=m['attendee2'],
-                        time_slot=m['time_slot'],
-                        room=m['room'],
-                        score=m['score']
-                    ) for m in proposed_meetings
+                    Meeting(**m) for m in proposed_meetings
                 ]
-
-                # Use bulk_create for high-performance database insertion.
-                Meeting.objects.bulk_create(meetings_to_create)
-
+                # On PostgreSQL, bulk_create returns the created objects with their new IDs.
+                created_meetings = Meeting.objects.bulk_create(meetings_to_create)
+                
+                self.stdout.write("Creating notifications for new meetings...")
+                notifications_to_create = []
+                for meeting in created_meetings:
+                    # Create a notification for both attendees.
+                    notifications_to_create.append(
+                        Notification(
+                            user=meeting.attendee1,
+                            event_type=Notification.EventType.MEETING_SCHEDULED,
+                            message=f"New meeting scheduled with {meeting.attendee2.username} at {meeting.time_slot.start_time.strftime('%-I:%M %p')}."
+                        )
+                    )
+                    notifications_to_create.append(
+                        Notification(
+                            user=meeting.attendee2,
+                            event_type=Notification.EventType.MEETING_SCHEDULED,
+                            message=f"New meeting scheduled with {meeting.attendee1.username} at {meeting.time_slot.start_time.strftime('%-I:%M %p')}."
+                        )
+                    )
+                Notification.objects.bulk_create(notifications_to_create)
             self.stdout.write(self.style.SUCCESS("Successfully generated and saved new meeting schedule!"))
         except Exception as e:
             self.stderr.write(self.style.ERROR(f"An error occurred: {e}"))

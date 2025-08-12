@@ -4,6 +4,7 @@ import api from '../api';
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [interests, setInterests] = useState('');
 
   const fetchProfile = async () => {
@@ -25,12 +26,22 @@ const Profile = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    // This is a simplified example. A real app would likely need to
-    // look up skill IDs based on the names provided.
-    console.log("Updating interests (demo)... This requires a more complex UI in a real app.");
-    // Example of what a PUT request would look like, though it needs skill IDs.
-    // await api.put('/profile/', { interest_ids: [1, 2] });
-    // alert("Profile updated!");
+    setIsUpdating(true);
+    try {
+      // Split the comma-separated string into an array of trimmed, non-empty strings.
+      const interestNames = interests.split(',').map(name => name.trim()).filter(name => name);
+      
+      // The backend is already configured to handle this payload.
+      await api.put('/profile/', { interest_names: interestNames });
+      alert("Profile updated successfully!");
+      // Re-fetch the profile to display the updated interests immediately.
+      fetchProfile();
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert("Failed to update profile.");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (loading) return <p>Loading profile...</p>;
@@ -52,7 +63,9 @@ const Profile = () => {
           />
         </label>
         <br />
-        <button type="submit" style={{ marginTop: '10px' }}>Update Interests (Demo)</button>
+        <button type="submit" style={{ marginTop: '10px' }} disabled={isUpdating}>
+          {isUpdating ? 'Updating...' : 'Update Interests'}
+        </button>
       </form>
     </div>
   );

@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { baseURL } from '../api'; // Import the base URL
 
 const Login = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Clear previous errors
     try {
       // For the initial login, we use axios directly as we don't have a token yet.
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+      const response = await axios.post(`${baseURL}token/`, {
         username,
         password,
       });
@@ -26,6 +29,7 @@ const Login = ({ onLoginSuccess }) => {
 
     } catch (error) {
       console.error('Login failed:', error);
+      setError('Login failed. Please check your username and password.');
     }
   };
 
@@ -36,6 +40,7 @@ const Login = ({ onLoginSuccess }) => {
       <br />
       <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
       <br />
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <button type="submit">Login</button>
     </form>
   );
