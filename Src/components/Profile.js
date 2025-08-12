@@ -6,6 +6,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [interests, setInterests] = useState('');
+  const [message, setMessage] = useState({ text: '', type: '' }); // For success/error messages
 
   const fetchProfile = async () => {
     try {
@@ -27,18 +28,21 @@ const Profile = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     setIsUpdating(true);
+    setMessage({ text: '', type: '' }); // Clear previous messages
     try {
       // Split the comma-separated string into an array of trimmed, non-empty strings.
       const interestNames = interests.split(',').map(name => name.trim()).filter(name => name);
       
       // The backend is already configured to handle this payload.
-      await api.put('/profile/', { interest_names: interestNames });
-      alert("Profile updated successfully!");
-      // Re-fetch the profile to display the updated interests immediately.
-      fetchProfile();
+      const response = await api.put('/profile/', { interest_names: interestNames });
+      setMessage({ text: 'Profile updated successfully!', type: 'success' });
+      // OPTIMIZATION: Use the data returned from the PUT request directly.
+      setProfile(response.data);
+      // Also update the input field to reflect the canonical names from the server
+      setInterests(response.data.interests.map(i => i.name).join(', '));
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert("Failed to update profile.");
+      setMessage({ text: 'Failed to update profile.', type: 'error' });
     } finally {
       setIsUpdating(false);
     }
@@ -63,6 +67,7 @@ const Profile = () => {
           />
         </label>
         <br />
+        {message.text && <p style={{ color: message.type === 'error' ? 'red' : 'green' }}>{message.text}</p>}
         <button type="submit" style={{ marginTop: '10px' }} disabled={isUpdating}>
           {isUpdating ? 'Updating...' : 'Update Interests'}
         </button>

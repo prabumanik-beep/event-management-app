@@ -7,11 +7,13 @@ const Login = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Clear previous errors
+    setIsLoading(true);
     try {
       // For the initial login, we use axios directly as we don't have a token yet.
       const response = await axios.post(`${baseURL}token/`, {
@@ -34,6 +36,8 @@ const Login = ({ onLoginSuccess }) => {
     } catch (error) {
       console.error('Login failed:', error);
       setError('Login failed. Please check your username and password.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,7 +49,9 @@ const Login = ({ onLoginSuccess }) => {
       <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
       <br />
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit">Login</button>
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? 'Logging in...' : 'Login'}
+      </button>
     </form>
   );
 };
