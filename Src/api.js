@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-export const baseURL = 'http://127.0.0.1:8000/api/';
+export const baseURL = process.env.NODE_ENV === 'production'
+  ? '/api/'
+  : 'http://127.0.0.1:8000/api/';
 
 const api = axios.create({
   baseURL: baseURL,
@@ -47,8 +49,11 @@ api.interceptors.response.use(
 
           return api(originalConfig);
         } catch (_error) {
-          // Handle failed refresh (e.g., redirect to login)
+          // Handle failed refresh by cleaning up and redirecting to login.
           console.error("Session expired. Please log in again.");
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          window.location.href = '/login'; // Force a redirect to the login page.
           return Promise.reject(_error);
         }
       }
