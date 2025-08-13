@@ -5,7 +5,7 @@ import formStyles from './Form.module.css';
 import Spinner from './Spinner';
 
 const Profile = () => {
-  const { profile, loading, isUpdating, message, fetchProfile, updateProfileInterests } = useProfile();
+  const { profile, loading, error, isUpdating, message, fetchProfile, updateProfileInterests } = useProfile();
   const [interests, setInterests] = useState('');
 
   useEffect(() => {
@@ -27,8 +27,9 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <p>Loading profile...</p>;
-  if (!profile) return <p>Could not load profile.</p>;
+  if (loading) return <div className="container"><p>Loading profile...</p></div>;
+  if (error) return <div className="container"><p style={{ color: 'red' }}>{error}</p></div>;
+  if (!profile) return <div className="container"><p>Profile not found.</p></div>;
 
   return (
     <div>
