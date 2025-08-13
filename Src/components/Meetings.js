@@ -43,9 +43,9 @@ const Meetings = () => {
             <li key={meeting.id}>
               Meeting with{' '}
               <strong>
-                {userProfile?.username === meeting.user1 ? meeting.user2 : meeting.user1}
+                {userProfile?.username === meeting.attendee1 ? meeting.attendee2 : meeting.attendee1}
               </strong>{' '}
-              on {formatDate(meeting.meeting_time)}
+              on {formatDate(meeting.time_slot)}
             </li>
           ))}
         </ul>
