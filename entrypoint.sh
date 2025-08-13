@@ -9,6 +9,9 @@ python manage.py migrate
 echo "--- Collecting static files ---"
 python manage.py collectstatic --noinput
 
+echo "--- Generating initial meetings ---"
+python manage.py generate_meetings
+
 echo "--- Creating initial admin user (if it doesn't exist) ---"
 python manage.py create_initial_admin
 

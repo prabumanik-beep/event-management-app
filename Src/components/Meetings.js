@@ -1,5 +1,17 @@
 import React, { useEffect } from 'react';
 import { useMeetings } from '../hooks/useMeetings';
+import styles from './Meetings.module.css';
+
+const formatDate = (dateString) => {
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  };
+  return new Date(dateString).toLocaleString(undefined, options);
+};
 
 const Meetings = () => {
   const { meetings, loading, error, fetchMeetings } = useMeetings();
@@ -8,20 +20,27 @@ const Meetings = () => {
     fetchMeetings();
   }, [fetchMeetings]);
 
-  if (loading) return <p>Loading meetings...</p>;
+  // Show a full-page loader only on the initial fetch
+  if (loading && meetings.length === 0) return <p>Loading meetings...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
     <div>
-      <h2>My Meetings</h2>
-      {meetings.length === 0 ? (
+      <div className={styles.header}>
+        <h2>My Meetings</h2>
+        <button onClick={fetchMeetings} disabled={loading}>
+          {loading ? 'Refreshing...' : 'Refresh Meetings'}
+        </button>
+      </div>
+
+      {meetings.length === 0 && !loading ? (
         <p>You have no scheduled meetings.</p>
       ) : (
         <ul>
           {meetings.map((meeting) => (
             <li key={meeting.id}>
               Meeting with <strong>{meeting.user1}</strong> and <strong>{meeting.user2}</strong> on{' '}
-              {new Date(meeting.meeting_time).toLocaleString()}
+              {formatDate(meeting.meeting_time)}
             </li>
           ))}
         </ul>
