@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useMeetings } from '../hooks/useMeetings';
+import { useAuth } from '../context/AuthContext';
 import styles from './Meetings.module.css';
 
 const formatDate = (dateString) => {
@@ -15,6 +16,7 @@ const formatDate = (dateString) => {
 
 const Meetings = () => {
   const { meetings, loading, error, fetchMeetings } = useMeetings();
+  const { userProfile } = useAuth();
 
   useEffect(() => {
     fetchMeetings();
@@ -39,8 +41,11 @@ const Meetings = () => {
         <ul>
           {meetings.map((meeting) => (
             <li key={meeting.id}>
-              Meeting with <strong>{meeting.user1}</strong> and <strong>{meeting.user2}</strong> on{' '}
-              {formatDate(meeting.meeting_time)}
+              Meeting with{' '}
+              <strong>
+                {userProfile?.username === meeting.user1 ? meeting.user2 : meeting.user1}
+              </strong>{' '}
+              on {formatDate(meeting.meeting_time)}
             </li>
           ))}
         </ul>
