@@ -31,10 +31,12 @@ export const useProfile = () => {
       const response = await api.put('/profile/', { interest_names: interestNames });
       setProfile(response.data);
       setMessage({ text: 'Profile updated successfully!', type: 'success' });
+      setTimeout(() => setMessage({ text: '', type: '' }), 5000); // Clear message after 5 seconds
       return response.data;
     } catch (error) {
       console.error('Failed to update profile:', error);
       setMessage({ text: 'Failed to update profile.', type: 'error' });
+      setTimeout(() => setMessage({ text: '', type: '' }), 5000); // Clear message after 5 seconds
       return null;
     } finally {
       setIsUpdating(false);

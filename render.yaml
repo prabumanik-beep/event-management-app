@@ -7,8 +7,6 @@ services:
     envVarGroups:
       - name: event-management-app-secrets
     # The command to run on every deployment.
-    # It runs migrations, creates the admin user, and starts the server.
-    startCommand: "./entrypoint.sh"
     healthCheckPath: /api/health-check/
     dockerfilePath: ./Dockerfile
     plan: free

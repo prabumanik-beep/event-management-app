@@ -21,10 +21,12 @@ class Command(BaseCommand):
             defaults={'email': email, 'is_staff': True, 'is_superuser': True}
         )
 
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Superuser "{username}" did not exist. A new superuser has been created.'))
+        else:
+            self.stdout.write(self.style.WARNING(f'Superuser "{username}" already exists.'))
+
+        self.stdout.write(f'Setting password for user "{username}"...')
         user.set_password(password)
         user.save()
-
-        if created:
-            self.stdout.write(self.style.SUCCESS(f'Successfully created superuser: {username}'))
-        else:
-            self.stdout.write(self.style.WARNING(f'Superuser "{username}" already exists. Password has been updated.'))
+        self.stdout.write(self.style.SUCCESS(f'Password for "{username}" has been set successfully.'))
