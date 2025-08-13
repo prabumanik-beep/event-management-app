@@ -45,7 +45,7 @@ const Meetings = () => {
               <strong>
                 {userProfile?.username === meeting.attendee1 ? meeting.attendee2 : meeting.attendee1}
               </strong>{' '}
-              on {formatDate(meeting.time_slot)}
+              on {formatDate(meeting.meeting_time)}
             </li>
           ))}
         </ul>

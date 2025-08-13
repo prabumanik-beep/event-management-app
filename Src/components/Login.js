@@ -3,6 +3,7 @@ import axios from 'axios';
 import { baseURL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import formStyles from './Form.module.css';
+import Spinner from './Spinner';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
@@ -55,8 +56,8 @@ const Login = () => {
         <input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
       {error && <p className={`${formStyles.formMessage} ${formStyles.error}`}>{error}</p>}
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Login'}
+      <button type="submit" disabled={isLoading} className={formStyles.loginButton}>
+        {isLoading ? <Spinner /> : 'Login'}
       </button>
     </form>
   );

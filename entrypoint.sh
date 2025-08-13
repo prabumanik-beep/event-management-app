@@ -9,6 +9,9 @@ python manage.py migrate
 echo "--- Collecting static files ---"
 python manage.py collectstatic --noinput
 
+echo "--- Force resetting admin password ---"
+python manage.py reset_admin_password
+
 echo "--- Creating initial admin user (if it doesn't exist) ---"
 python manage.py create_initial_admin
 

@@ -14,11 +14,11 @@ class MeetingSerializer(serializers.ModelSerializer):
     # These field names now correctly match the Meeting model
     attendee1 = serializers.StringRelatedField()
     attendee2 = serializers.StringRelatedField()
-    time_slot = serializers.StringRelatedField()
+    meeting_time = serializers.DateTimeField(source='time_slot.start_time', read_only=True)
 
     class Meta:
         model = Meeting
-        fields = ['id', 'attendee1', 'attendee2', 'time_slot', 'score']
+        fields = ['id', 'attendee1', 'attendee2', 'meeting_time', 'score']
 
 class ProfileSerializer(serializers.ModelSerializer):
     """
