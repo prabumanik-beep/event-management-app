@@ -3,6 +3,7 @@ import { useProfile } from '../hooks/useProfile';
 import profileStyles from './Profile.module.css';
 import formStyles from './Form.module.css';
 import Spinner from './Spinner';
+import StatusDisplay from './StatusDisplay';
 
 const Profile = () => {
   const { profile, loading, error, isUpdating, message, fetchProfile, updateProfileInterests } = useProfile();
@@ -27,31 +28,34 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <div className="container"><p>Loading profile...</p></div>;
-  if (error) return <div className="container"><p style={{ color: 'red' }}>{error}</p></div>;
-  if (!profile) return <div className="container"><p>Profile not found.</p></div>;
-
   return (
-    <div>
-      <h2>My Profile</h2>
-      <p><strong>Username:</strong> {profile.username}</p>
-      <p><strong>Role:</strong> {profile.role}</p>
-      <form onSubmit={handleUpdate} className={profileStyles.profileForm}>
-        <div>
-          <label htmlFor="profile-interests">Interests (comma-separated):</label>
-          <input 
-            id="profile-interests"
-            type="text" 
-            value={interests}
-            onChange={(e) => setInterests(e.target.value)}
-          />
+    <StatusDisplay loading={loading} error={error} loadingText="Loading profile..." emptyText="Profile not found.">
+      {profile && (
+        <div className={profileStyles.profileContainer}>
+          <div className={profileStyles.profileCard}>
+            <h2>My Profile</h2>
+            <p><strong>Username:</strong> {profile.username}</p>
+            <p><strong>Role:</strong> {profile.role}</p>
+            <form onSubmit={handleUpdate} className={profileStyles.profileForm}>
+              <div className={formStyles.inputGroup}>
+                <label htmlFor="profile-interests">Interests (comma-separated):</label>
+                <input
+                  id="profile-interests"
+                  type="text"
+                  value={interests}
+                  onChange={(e) => setInterests(e.target.value)}
+                  disabled={isUpdating}
+                />
+              </div>
+              {message.text && <p className={`${formStyles.formMessage} ${formStyles[message.type]}`}>{message.text}</p>}
+              <button type="submit" disabled={isUpdating} className={profileStyles.updateButton}>
+                {isUpdating ? <Spinner /> : 'Update Interests'}
+              </button>
+            </form>
+          </div>
         </div>
-        {message.text && <p className={`${formStyles.formMessage} ${formStyles[message.type]}`}>{message.text}</p>}
-        <button type="submit" disabled={isUpdating} className={profileStyles.updateButton}>
-          {isUpdating ? <Spinner /> : 'Update Interests'}
-        </button>
-      </form>
-    </div>
+      )}
+    </StatusDisplay>
   );
 };
 

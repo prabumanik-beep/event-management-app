@@ -1,29 +1,20 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from scheduling.views import ProfileView, health_check
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
 from django.views.generic import TemplateView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from scheduling.views import ProfileView, health_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    # API Documentation
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-
-    # JWT Authentication
+    
+    # API Endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    # Application URLs
-    path('api/', include('scheduling.urls')),
+    path('api/profile/', ProfileView.as_view(), name='profile'),
+    path('api/meetings/', include('scheduling.urls')),
     path('api/health-check/', health_check, name='health_check'),
 
-    # Let React handle routing for any other path
-    # This must be the last URL pattern
+    # Frontend Serving
+    # This catch-all route serves the React index.html for any non-API, non-admin path.
     re_path(r'^.*', TemplateView.as_view(template_name='index.html')),
 ]

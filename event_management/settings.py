@@ -6,39 +6,36 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-goes-here-change-me')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS_str = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_str.split(',')]
+ALLOWED_HOSTS_str = os.environ.get('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_str.split(',') if host.strip()]
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # Whitenoise is for serving static files in production
+    'whitenoise.runserver_nostatic', # Should be before staticfiles
     'django.contrib.staticfiles',
-
     # 3rd Party Apps
     'rest_framework',
     'rest_framework_simplejwt',
-    'drf_spectacular',
-    'django_filters',
     'corsheaders',
-
-    # Your Apps
+    # Local Apps
     'scheduling',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # WhiteNoise middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # CORS middleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -51,7 +48,8 @@ ROOT_URLCONF = 'event_management.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'build'], # Look for index.html in the React build folder
+        # This tells Django where to find the React index.html
+        'DIRS': [os.path.join(BASE_DIR, 'frontend', 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,46 +65,49 @@ TEMPLATES = [
 WSGI_APPLICATION = 'event_management.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+DATABASES = {
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+}
 
-DATABASES = {}
-if 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
-else:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+# Password validation
+# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+]
 
+# Internationalization
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# This is the crucial line: it tells Django where to find the React app's static files.
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend', 'build', 'static'),
+]
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS_str = os.environ.get('CORS_ALLOWED_ORIGINS', '')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_str.split(',') if origin.strip()]
+
+# Django REST Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'scheduling.pagination.StandardResultsSetPagination',
-    'PAGE_SIZE': 25,
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
-
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Vibe Coding Event API',
-    'DESCRIPTION': 'API for managing users, meetings, and scheduling for the Vibe Coding Event.',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-}
-
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / "build/static", # Look for React's static files
-]
-# Use whitenoise's storage backend for gzipping and caching static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Default email address for notifications
-DEFAULT_FROM_EMAIL = 'noreply@vibecoding.com'
-
-# CORS Settings - Allows your React frontend to talk to your Django backend
-CORS_ALLOWED_ORIGINS_str = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000')
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_str.split(',')]
