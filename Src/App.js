@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
 import Login from './components/Login';
 import Profile from './components/Profile';
+import Meetings from './components/Meetings';
 import ProtectedRoute from './components/ProtectedRoute';
 import styles from './App.module.css';
 import { useAuth } from './context/AuthContext';
@@ -20,7 +21,9 @@ function App() {
       <nav>
         {isLoggedIn ? (
           <>
-            <Link to="/profile">Profile</Link> | <button onClick={handleLogout} className={styles.navLogoutButton}>Logout</button>
+            <Link to="/profile">Profile</Link> |{' '}
+            <Link to="/meetings">My Meetings</Link> |{' '}
+            <button onClick={handleLogout} className={styles.navLogoutButton}>Logout</button>
           </>
         ) : (
           <Link to="/login">Login</Link>
@@ -34,6 +37,7 @@ function App() {
         {/* Protected Routes are nested inside the ProtectedRoute component */}
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<Profile />} />
+          <Route path="/meetings" element={<Meetings />} />
         </Route>
 
         <Route path="*" element={<Navigate to={isLoggedIn ? '/profile' : '/login'} />} />

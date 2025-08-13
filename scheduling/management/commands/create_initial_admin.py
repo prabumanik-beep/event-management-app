@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth import get_user_model
 import os
 
@@ -12,10 +12,9 @@ class Command(BaseCommand):
         email = os.environ.get('DJANGO_ADMIN_EMAIL')
 
         if not all([username, password, email]):
-            self.stdout.write(self.style.ERROR(
+            raise CommandError(
                 'Missing environment variables: DJANGO_ADMIN_USERNAME, DJANGO_ADMIN_PASSWORD, DJANGO_ADMIN_EMAIL'
-            ))
-            return
+            )
 
         if not User.objects.filter(username=username).exists():
             User.objects.create_superuser(username=username, email=email, password=password)
