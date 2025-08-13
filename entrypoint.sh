@@ -13,9 +13,6 @@ echo "--- [3/5] Collecting static files ---"
 python manage.py collectstatic --noinput
 echo "--- Static files collected ---"
 
-echo "--- [4/5] Generating meetings for users with shared interests ---"
-python manage.py generate_meetings
-
 echo "--- [4/5] Ensuring admin user exists ---"
 python manage.py setup_admin_user
 echo "--- Admin user setup complete ---"

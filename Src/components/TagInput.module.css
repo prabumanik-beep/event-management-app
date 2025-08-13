@@ -1,0 +1,36 @@
+.tagInputContainer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    background-color: #007bff;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin: 0.25rem;
+}
+
+.tagRemoveButton {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.tagInput {
+    border: none;
+    outline: none;
+    flex-grow: 1;
+    padding: 0.25rem;
+}
