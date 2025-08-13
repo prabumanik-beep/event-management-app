@@ -1,47 +1,35 @@
 import React from 'react';
-import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import Meetings from './components/Meetings';
 import ProtectedRoute from './components/ProtectedRoute';
-import styles from './App.module.css';
+import Navbar from './components/Navbar';
 import { useAuth } from './context/AuthContext';
 
 function App() {
-  const { isLoggedIn, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const { isLoggedIn } = useAuth();
 
   return (
     <div>
-      <nav>
-        {isLoggedIn ? (
-          <>
-            <Link to="/profile">Profile</Link> |{' '}
-            <Link to="/meetings">My Meetings</Link> |{' '}
-            <button onClick={handleLogout} className={styles.navLogoutButton}>Logout</button>
-          </>
-        ) : (
-          <Link to="/login">Login</Link>
-        )}
-      </nav>
-      <hr />
-      <Routes>
-        {/* If user is logged in, /login redirects to /profile. Otherwise, show Login page. */}
-        <Route path="/login" element={isLoggedIn ? <Navigate to="/profile" /> : <Login />} />
+      <Navbar />
+      <main className="container">
+        <Routes>
+          {/* If user is logged in, /login redirects to /profile. Otherwise, show Login page. */}
+          <Route path="/login" element={isLoggedIn ? <Navigate to="/profile" /> : <Login />} />
 
-        {/* Protected Routes are nested inside the ProtectedRoute component */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/meetings" element={<Meetings />} />
-        </Route>
+          {/* Redirect root path to the appropriate page */}
+          <Route path="/" element={<Navigate to={isLoggedIn ? "/profile" : "/login"} />} />
 
-        <Route path="*" element={<Navigate to={isLoggedIn ? '/profile' : '/login'} />} />
-      </Routes>
+          {/* Protected Routes are nested inside the ProtectedRoute component */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/meetings" element={<Meetings />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </main>
     </div>
   );
 }
