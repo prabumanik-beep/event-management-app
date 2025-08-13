@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useProfile } from '../hooks/useProfile';
 import profileStyles from './Profile.module.css';
 import formStyles from './Form.module.css';
+import Spinner from './Spinner';
 
 const Profile = () => {
   const { profile, loading, isUpdating, message, fetchProfile, updateProfileInterests } = useProfile();
@@ -45,8 +46,8 @@ const Profile = () => {
           />
         </div>
         {message.text && <p className={`${formStyles.formMessage} ${formStyles[message.type]}`}>{message.text}</p>}
-        <button type="submit" disabled={isUpdating}>
-          {isUpdating ? 'Updating...' : 'Update Interests'}
+        <button type="submit" disabled={isUpdating} className={profileStyles.updateButton}>
+          {isUpdating ? <Spinner /> : 'Update Interests'}
         </button>
       </form>
     </div>

@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { baseURL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import formStyles from './Form.module.css';
 import Spinner from './Spinner';
@@ -19,21 +17,9 @@ const Login = () => {
     setError(''); // Clear previous errors
     setIsLoading(true);
     try {
-      // For the initial login, we use axios directly as we don't have a token yet.
-      const response = await axios.post(`${baseURL}token/`, {
-        username,
-        password,
-      });
-      
-      // Store tokens in localStorage
-      localStorage.setItem('access_token', response.data.access);
-      localStorage.setItem('refresh_token', response.data.refresh);
-
-      console.log('Login successful!');
-      // Update the global auth state
-      login();
-      // Redirect to the profile page after successful login
-      navigate('/profile');
+      await login(username, password);
+      // On success, redirect to the profile page
+      navigate('/profile', { replace: true });
 
     } catch (error) {
       console.error('Login failed:', error);
@@ -45,21 +31,23 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <div>
-        <label htmlFor="login-username">Username</label>
-        <input id="login-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-      </div>
-      <div>
-        <label htmlFor="login-password">Password</label>
-        <input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-      </div>
-      {error && <p className={`${formStyles.formMessage} ${formStyles.error}`}>{error}</p>}
-      <button type="submit" disabled={isLoading} className={formStyles.loginButton}>
-        {isLoading ? <Spinner /> : 'Login'}
-      </button>
-    </form>
+    <div className={formStyles.loginContainer}>
+      <form onSubmit={handleSubmit} className={formStyles.loginForm}>
+        <h2>Login</h2>
+        <div className={formStyles.inputGroup}>
+          <label htmlFor="login-username">Username</label>
+          <input id="login-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+        </div>
+        <div className={formStyles.inputGroup}>
+          <label htmlFor="login-password">Password</label>
+          <input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+        {error && <p className={`${formStyles.formMessage} ${formStyles.error}`}>{error}</p>}
+        <button type="submit" disabled={isLoading} className={formStyles.loginButton}>
+          {isLoading ? <Spinner /> : 'Login'}
+        </button>
+      </form>
+    </div>
   );
 };
 

@@ -9,11 +9,8 @@ python manage.py migrate
 echo "--- Collecting static files ---"
 python manage.py collectstatic --noinput
 
-echo "--- Force resetting admin password ---"
-python manage.py reset_admin_password
-
-echo "--- Creating initial admin user (if it doesn't exist) ---"
-python manage.py create_initial_admin
+echo "--- Setting up admin user ---"
+python manage.py setup_admin_user
 
 echo "--- Starting Gunicorn server ---"
 # Use the PORT environment variable provided by Render, defaulting to 10000.

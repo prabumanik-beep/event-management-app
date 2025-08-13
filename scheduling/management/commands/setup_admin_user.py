@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 import os
 
 class Command(BaseCommand):
-    help = 'Creates an admin user non-interactively if it does not exist, using environment variables.'
+    help = 'Creates the admin user from environment variables if it does not exist, or updates the password if it does.'
 
     def handle(self, *args, **options):
         User = get_user_model()
@@ -16,8 +16,15 @@ class Command(BaseCommand):
                 'Missing environment variables: DJANGO_ADMIN_USERNAME, DJANGO_ADMIN_PASSWORD, DJANGO_ADMIN_EMAIL'
             )
 
-        if not User.objects.filter(username=username).exists():
-            User.objects.create_superuser(username=username, email=email, password=password)
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={'email': email, 'is_staff': True, 'is_superuser': True}
+        )
+
+        user.set_password(password)
+        user.save()
+
+        if created:
             self.stdout.write(self.style.SUCCESS(f'Successfully created superuser: {username}'))
         else:
-            self.stdout.write(self.style.WARNING(f'Superuser "{username}" already exists.'))
+            self.stdout.write(self.style.WARNING(f'Superuser "{username}" already exists. Password has been updated.'))

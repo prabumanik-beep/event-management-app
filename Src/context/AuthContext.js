@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import api from '../api'; // We need the configured axios instance
+import axios from 'axios';
+import api, { baseURL } from '../api'; // We need the configured axios instance and baseURL
 
 const AuthContext = createContext(null);
 
@@ -8,9 +9,23 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true); // Start in a loading state
 
-  const login = () => {
-    setIsLoggedIn(true);
-    // The useEffect below will now re-run and fetch the profile.
+  const login = async (username, password) => {
+    try {
+      // Use the exported baseURL for clarity and consistency.
+      const response = await axios.post(`${baseURL}token/`, {
+        username,
+        password,
+      });
+      
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
+      setIsLoggedIn(true);
+      // The useEffect below will now re-run and fetch the profile.
+      return true; // Indicate success
+    } catch (error) {
+      console.error("Login API call failed:", error);
+      throw error; // Re-throw the error to be caught by the component
+    }
   };
 
   const logout = useCallback(() => {
