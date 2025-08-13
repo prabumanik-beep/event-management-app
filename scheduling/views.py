@@ -12,6 +12,7 @@ from rest_framework import viewsets, status, generics, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework.views import APIView
 
 from .filters import MeetingFilter, TimeSlotFilter, MyProposalsFilter
@@ -34,6 +35,9 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user.profile
 
+def health_check(request):
+    return JsonResponse({"status": "ok", "message": "Health check passed"})
+                        
 class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer

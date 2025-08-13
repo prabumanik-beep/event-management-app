@@ -1,0 +1,10 @@
+.nav-logout-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #007bff; /* A standard link color */
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+  margin-left: 5px; /* Add some spacing */
+}

@@ -1,0 +1,16 @@
+.profile-form {
+    margin-top: 20px;
+}
+
+.profile-form div {
+    display: block;
+    margin-bottom: 15px;
+}
+
+.profile-form input {
+    width: 300px;
+}
+
+.profile-form label {
+    margin-right: 10px;
+}

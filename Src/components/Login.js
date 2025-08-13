@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { baseURL } from '../api'; // Import the base URL
 import { useNavigate } from 'react-router-dom';
-import '../styles/Form.css';
+import formStyles from './Form.module.css';
+import { useAuth } from '../context/AuthContext';
 
-const Login = ({ onLoginSuccess }) => {
+const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,16 +29,15 @@ const Login = ({ onLoginSuccess }) => {
       localStorage.setItem('refresh_token', response.data.refresh);
 
       console.log('Login successful!');
-      // Notify the parent component that login was successful
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      }
+      // Update the global auth state
+      login();
       // Redirect to the profile page after successful login
       navigate('/profile');
 
     } catch (error) {
       console.error('Login failed:', error);
-      setError('Login failed. Please check your username and password.');
+      // Use a more specific error message from the backend if available
+      setError(error.response?.data?.detail || 'Login failed. Please check your username and password.');
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +54,7 @@ const Login = ({ onLoginSuccess }) => {
         <label htmlFor="login-password">Password</label>
         <input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
-      {error && <p className="form-message error">{error}</p>}
+      {error && <p className={`${formStyles.formMessage} ${formStyles.error}`}>{error}</p>}
       <button type="submit" disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Login'}
       </button>

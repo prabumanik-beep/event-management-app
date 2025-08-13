@@ -1,52 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api';
-import '../styles/Profile.css';
-import '../styles/Form.css';
+import { useProfile } from '../hooks/useProfile';
+import profileStyles from './Profile.module.css';
+import formStyles from './Form.module.css';
 
 const Profile = () => {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { profile, loading, isUpdating, message, fetchProfile, updateProfileInterests } = useProfile();
   const [interests, setInterests] = useState('');
-  const [message, setMessage] = useState({ text: '', type: '' }); // For success/error messages
-
-  const fetchProfile = async () => {
-    try {
-      const response = await api.get('/profile/');
-      setProfile(response.data);
-      // Pre-fill the interest input with existing interests
-      setInterests(response.data.interests.map(i => i.name).join(', '));
-    } catch (error) {
-      console.error('Failed to fetch profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    const loadProfile = async () => {
+      const initialProfile = await fetchProfile();
+      if (initialProfile) {
+        setInterests(initialProfile.interests.map(i => i.name).join(', '));
+      }
+    };
+    loadProfile();
+  }, [fetchProfile]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    setIsUpdating(true);
-    setMessage({ text: '', type: '' }); // Clear previous messages
-    try {
-      // Split the comma-separated string into an array of trimmed, non-empty strings.
-      const interestNames = interests.split(',').map(name => name.trim()).filter(name => name);
-      
-      // The backend is already configured to handle this payload.
-      const response = await api.put('/profile/', { interest_names: interestNames });
-      setMessage({ text: 'Profile updated successfully!', type: 'success' });
-      // OPTIMIZATION: Use the data returned from the PUT request directly.
-      setProfile(response.data);
-      // Also update the input field to reflect the canonical names from the server
-      setInterests(response.data.interests.map(i => i.name).join(', '));
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      setMessage({ text: 'Failed to update profile.', type: 'error' });
-    } finally {
-      setIsUpdating(false);
+    const interestNames = interests.split(',').map(name => name.trim()).filter(name => name);
+    const updatedProfile = await updateProfileInterests(interestNames);
+    if (updatedProfile) {
+      setInterests(updatedProfile.interests.map(i => i.name).join(', '));
     }
   };
 
@@ -58,16 +34,17 @@ const Profile = () => {
       <h2>My Profile</h2>
       <p><strong>Username:</strong> {profile.username}</p>
       <p><strong>Role:</strong> {profile.role}</p>
-      <form onSubmit={handleUpdate} className="profile-form">
-        <label>
-          Interests (comma-separated):
+      <form onSubmit={handleUpdate} className={profileStyles.profileForm}>
+        <div>
+          <label htmlFor="profile-interests">Interests (comma-separated):</label>
           <input 
+            id="profile-interests"
             type="text" 
             value={interests}
             onChange={(e) => setInterests(e.target.value)}
           />
-        </label>
-        {message.text && <p className={`form-message ${message.type}`}>{message.text}</p>}
+        </div>
+        {message.text && <p className={`${formStyles.formMessage} ${formStyles[message.type]}`}>{message.text}</p>}
         <button type="submit" disabled={isUpdating}>
           {isUpdating ? 'Updating...' : 'Update Interests'}
         </button>
