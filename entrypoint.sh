@@ -13,4 +13,6 @@ echo "--- Creating initial admin user (if it doesn't exist) ---"
 python manage.py create_initial_admin
 
 echo "--- Starting Gunicorn server ---"
-exec gunicorn event_management.wsgi:application
+# Use the PORT environment variable provided by Render
+# Bind to 0.0.0.0 to be accessible from outside the container
+exec gunicorn event_management.wsgi:application --bind 0.0.0.0:$PORT

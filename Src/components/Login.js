@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { baseURL } from '../api'; // Import the base URL
+import { baseURL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import formStyles from './Form.module.css';
 import { useAuth } from '../context/AuthContext';
