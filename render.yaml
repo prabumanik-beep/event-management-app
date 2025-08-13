@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: event-management-app
+    env: docker
+    # This will be the name of the environment group you create in the Render dashboard
+    # It's where you'll store your secret keys and database URL.
+    envVarGroups:
+      - event-management-app-secrets
+    # The command to run on every deployment.
+    # It runs migrations, creates the admin user, and starts the server.
+    startCommand: "python manage.py migrate && python manage.py create_initial_admin && gunicorn event_management.wsgi:application"
+    healthCheckPath: /api/health-check/
+    dockerfilePath: ./Dockerfile
+    plan: free
+    autoDeploy: true

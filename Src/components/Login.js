@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { baseURL } from '../api'; // Import the base URL
 import { useNavigate } from 'react-router-dom';
+import '../styles/Form.css';
 
 const Login = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
@@ -44,11 +45,15 @@ const Login = ({ onLoginSuccess }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Login</h2>
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
-      <br />
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-      <br />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div>
+        <label htmlFor="login-username">Username</label>
+        <input id="login-username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+      </div>
+      <div>
+        <label htmlFor="login-password">Password</label>
+        <input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      </div>
+      {error && <p className="form-message error">{error}</p>}
       <button type="submit" disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Login'}
       </button>

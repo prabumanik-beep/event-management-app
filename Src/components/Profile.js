@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
+import '../styles/Profile.css';
+import '../styles/Form.css';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -56,19 +58,17 @@ const Profile = () => {
       <h2>My Profile</h2>
       <p><strong>Username:</strong> {profile.username}</p>
       <p><strong>Role:</strong> {profile.role}</p>
-      <form onSubmit={handleUpdate}>
+      <form onSubmit={handleUpdate} className="profile-form">
         <label>
           Interests (comma-separated):
           <input 
             type="text" 
             value={interests}
             onChange={(e) => setInterests(e.target.value)}
-            style={{ width: '300px', marginLeft: '10px' }}
           />
         </label>
-        <br />
-        {message.text && <p style={{ color: message.type === 'error' ? 'red' : 'green' }}>{message.text}</p>}
-        <button type="submit" style={{ marginTop: '10px' }} disabled={isUpdating}>
+        {message.text && <p className={`form-message ${message.type}`}>{message.text}</p>}
+        <button type="submit" disabled={isUpdating}>
           {isUpdating ? 'Updating...' : 'Update Interests'}
         </button>
       </form>

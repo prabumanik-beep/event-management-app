@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from scheduling.views import ProfileView, health_check
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -20,6 +21,7 @@ urlpatterns = [
 
     # Application URLs
     path('api/', include('scheduling.urls')),
+    path('api/health-check/', health_check, name='health_check'),
 
     # Let React handle routing for any other path
     # This must be the last URL pattern
