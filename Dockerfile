@@ -14,7 +14,7 @@ COPY public/ ./public/
 RUN npm run build
 
 # Stage 2: Build the final Python backend image
-FROM python:3.11-slim
+FROM python:3.9-slim
 ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
